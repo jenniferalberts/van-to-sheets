@@ -1,0 +1,17 @@
+function name_of_function() { //name your function
+  var label = GmailApp.getUserLabelByName("parent_label/label_used"); //use gmail labels to help classify differen reports
+  var threads = label.getThreads(0,1)[0];
+  var count = threads.getMessageCount()-1;
+  var message = threads.getMessages()[count];
+  var body = message.getPlainBody();
+  var link = body.match(/\<(.*)\>/).pop(); //nothing to do here...use regular expression to scrape VAN Report email, this expression should capture anything 
+// between <> in case VAN decides to change the download url structure
+  var file = UrlFetchApp.fetch(link);
+  var csvData = Utilities.parseCsv(file.getBlob().getDataAsString());
+  var sheet = SpreadsheetApp.openById("10oHOmLyUcKzkcjXmQG7rIA4RNpDiFzov6KmcjYEre64"); // link to relevant google sheet
+  var first = sheet.getSheetByName("OpenShifts"); // name of tab you want data to go
+  first.clearContents().clearFormats(); // nothing to do here...wipe data before loading
+  first.getRange(1, 1, csvData.length, csvData[0].length).setValues(csvData); // nothing to do here...load data
+
+ Logger.log(link); // nothing to do here...use the logger.log function to debug your code
+}
